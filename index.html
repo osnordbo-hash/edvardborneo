@@ -70,6 +70,13 @@ section{padding:120px 0}
 .gig-empty a{color:var(--ink);border-bottom:1px solid var(--ink)}
 .more{margin-top:40px;background:#fff;border:1px solid var(--ink);padding:14px 30px;font:inherit;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;cursor:pointer}
 .more:hover{background:var(--ink);color:#fff}
+.gig-tools{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:40px}
+.gig-tools .more{margin-top:0;display:inline-block;color:var(--ink)}
+.gig-tools .more:hover{color:#fff}
+.near-msg{text-align:center;color:var(--mut);font-size:14px;margin-top:16px}
+.gig.near{background:#f6f6f6;padding-left:18px;padding-right:18px}
+.gig .nl{display:inline-block;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;background:var(--ink);color:#fff;padding:4px 10px;margin-bottom:14px}
+.gig-map{max-width:880px;margin:48px auto 0;height:420px;background:#f2f2f2;filter:grayscale(1)}
 .gigtile{aspect-ratio:16/7}
 .gigtile img{object-position:50% 30%}
 .video{position:relative;aspect-ratio:16/9;background:#000}
@@ -146,6 +153,7 @@ body.shop #main{display:none}
   .products{grid-template-columns:1fr 1fr;gap:20px;margin-bottom:64px}
   .fgrid{grid-template-columns:1fr}
   .shoptile{aspect-ratio:4/3}
+  .gig-map{height:320px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 </style>
@@ -175,6 +183,12 @@ body.shop #main{display:none}
       <h2 class="title">Konserter</h2>
       <div class="gigs" id="gigs"><p class="gig-empty">Laster konserter&hellip;</p></div>
       <div class="center"><button class="more" id="gigMore" hidden>Vis flere</button></div>
+      <div class="gig-tools">
+        <button class="more" id="gigNear" hidden>Finn n&aelig;rmeste konsert</button>
+        <a class="more" href="https://artists.bandsintown.com/artists/15517593/events/upcoming" target="_blank" rel="noopener">Alle konserter p&aring; Bandsintown</a>
+      </div>
+      <p class="near-msg" id="nearMsg" hidden></p>
+      <div class="gig-map" id="gigMap" hidden></div>
     </div></section>
 
     <section id="music"><div class="wrap">
@@ -299,6 +313,7 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
     var today=new Date();today.setHours(0,0,0,0);
     list=list.map(function(g){g._d=toDate(g.dato);g._e=toDate(g.sluttdato);return g;})
       .filter(function(g){return g._d&&(g._e||g._d)>=today;}).sort(function(a,b){return a._d-b._d;});
+    document.dispatchEvent(new CustomEvent('gigs:ready',{detail:list}));
     if(!list.length){box.innerHTML='<p class="gig-empty">Ingen annonserte konserter akkurat n&aring;. F&oslash;lg med p&aring; <a href="'+BANDSINTOWN+'" target="_blank" rel="noopener">Bandsintown</a>.</p>';return;}
     box.innerHTML=list.map(function(g,i){
       var d=pad(g._d.getDate())+'.'+pad(g._d.getMonth()+1)+(g._e?' &ndash; '+pad(g._e.getDate())+'.'+pad(g._e.getMonth()+1):'');
@@ -317,6 +332,41 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
   if(!SHEET_CSV_URL){render([]);return;}
   fetch(SHEET_CSV_URL,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){render(parseCSV(t));}).catch(function(){render([]);});
 })();
+
+/* Kart + nærmeste konsert (som på oskarnordbo.no) */
+document.addEventListener('gigs:ready',function(ev){
+  var list=ev.detail.filter(function(g){return g.lat&&g.lng&&!isNaN(+g.lat)&&!isNaN(+g.lng);});
+  if(!list.length) return;
+  var near=document.getElementById('gigNear'),msg=document.getElementById('nearMsg'),mapEl=document.getElementById('gigMap'),map,marks=[];
+  near.hidden=false; mapEl.hidden=false;
+  var css=document.createElement('link');css.rel='stylesheet';css.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';document.head.appendChild(css);
+  var js=document.createElement('script');js.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+  js.onload=function(){
+    map=L.map(mapEl,{scrollWheelZoom:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:18}).addTo(map);
+    var b=[];
+    list.forEach(function(g){var ll=[+g.lat,+g.lng];b.push(ll);
+      var d=('0'+g._d.getDate()).slice(-2)+'.'+('0'+(g._d.getMonth()+1)).slice(-2);
+      var m=L.circleMarker(ll,{radius:7,color:'#111',weight:2,fillColor:'#111',fillOpacity:1}).addTo(map).bindPopup('<b>'+d+'</b><br>'+(g.sted||'')+'<br>'+(g.by||''));
+      marks.push({g:g,m:m});});
+    if(b.length==1)map.setView(b[0],9);else map.fitBounds(b,{padding:[40,40]});
+  };
+  document.head.appendChild(js);
+  function km(a,b,c,d){var R=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,h=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)*Math.sin(y/2);return 2*R*Math.asin(Math.sqrt(h));}
+  near.addEventListener('click',function(){
+    if(!navigator.geolocation){msg.hidden=false;msg.textContent='Posisjon støttes ikke i nettleseren din.';return;}
+    msg.hidden=false;msg.textContent='Finner posisjonen din…';
+    navigator.geolocation.getCurrentPosition(function(p){
+      var best=null,bd=1e9;
+      list.forEach(function(g){var d=km(p.coords.latitude,p.coords.longitude,+g.lat,+g.lng);if(d<bd){bd=d;best=g;}});
+      document.querySelectorAll('.gig.near').forEach(function(e){e.classList.remove('near');var l=e.querySelector('.nl');if(l)l.remove();});
+      var all=ev.detail,i=all.indexOf(best),el=document.querySelectorAll('#gigs .gig')[i];
+      if(el){el.hidden=false;el.classList.add('near');var t=document.createElement('div');t.className='nl';t.textContent='Nærmest deg · '+Math.round(bd)+' km unna';el.insertBefore(t,el.firstChild);el.scrollIntoView({behavior:'smooth',block:'center'});}
+      msg.hidden=true;
+      if(map)marks.forEach(function(x){if(x.g===best){map.setView(x.m.getLatLng(),9);x.m.openPopup();}});
+    },function(){msg.textContent='Fant ikke posisjonen din.';},{timeout:10000});
+  });
+});
 
 /* Butikken er en egen side (#butikk) som ikke vises p&aring; forsiden */
 function route(){
