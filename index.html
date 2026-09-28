@@ -71,7 +71,7 @@ section{padding:120px 0}
 .more{margin-top:40px;background:#fff;border:1px solid var(--ink);padding:14px 30px;font:inherit;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;cursor:pointer}
 .more:hover{background:var(--ink);color:#fff}
 .gig-tools{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:40px}
-.gig-tools .more{margin-top:0;display:inline-block;color:var(--ink)}
+.gig-tools .more{margin-top:0;display:inline-flex;align-items:center;justify-content:center;text-align:center;color:var(--ink);min-width:300px}
 .gig-tools .more:hover{color:#fff}
 .near-msg{text-align:center;color:var(--mut);font-size:14px;margin-top:16px}
 .gig.near{background:#f6f6f6;padding-left:18px;padding-right:18px}
@@ -152,6 +152,8 @@ body.shop #main{display:none}
   .fgrid{grid-template-columns:1fr}
   .shoptile{aspect-ratio:4/3}
   .gig-map{height:320px}
+  .gig-tools{flex-direction:column;align-items:stretch}
+  .gig-tools .more{min-width:0;width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 </style>
@@ -340,7 +342,7 @@ document.addEventListener('gigs:ready',function(ev){
   var js=document.createElement('script');js.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
   js.onload=function(){
     map=L.map(mapEl,{scrollWheelZoom:false});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:18}).addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18}).addTo(map);
     var b=[];
     list.forEach(function(g){var ll=[+g.lat,+g.lng];b.push(ll);
       var d=('0'+g._d.getDate()).slice(-2)+'.'+('0'+(g._d.getMonth()+1)).slice(-2);
