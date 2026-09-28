@@ -181,7 +181,7 @@ body.shop #main{display:none}
     <section id="tour"><div class="wrap">
       <h2 class="title">Konserter</h2>
       <div class="gigs" id="gigs"><p class="gig-empty">Laster konserter&hellip;</p></div>
-      <div class="center"><button class="more" id="gigMore" hidden>Vis flere</button></div>
+      <div class="center"><button class="more" id="gigMore" hidden>Vis mer</button></div>
       <div class="gig-tools">
         <button class="more" id="gigNear" hidden>Finn n&aelig;rmeste konsert</button>
         <a class="more" href="https://artists.bandsintown.com/artists/15517593/events/upcoming" target="_blank" rel="noopener">Alle konserter p&aring; Bandsintown</a>
@@ -289,7 +289,7 @@ body.shop #main{display:none}
 var SHEET_CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vRQeuPzJx0pNNwSIFfwSXruEmJqNNH1Rc_JLSw8q42sf3kVUpn_-JFP8O6mRC7XGnfxHOAuk3eOsxiv/pub?gid=1373285844&single=true&output=csv';
 var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcoming';
 (function(){
-  var box=document.getElementById('gigs'),more=document.getElementById('gigMore'),SHOW=6;
+  var box=document.getElementById('gigs'),more=document.getElementById('gigMore'),SHOW=4;
   function toDate(s){s=(s||'').trim();var m=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);if(m)return new Date(+m[3],m[2]-1,+m[1]);
     m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(m)return new Date(+m[1],m[2]-1,+m[3]);return null;}
   function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -325,8 +325,8 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
       return '<div class="gig"'+(i>=SHOW?' hidden':'')+'><div class="d">'+d+'</div>'+(g.tid?'<div class="tm">'+esc(g.tid)+'</div>':'')+
         '<div class="st">'+esc(g.sted)+'</div><div class="by">'+esc(g.by)+'</div>'+(nb?'<div class="nb">'+esc(nb)+'</div>':'')+'<div class="acts">'+acts+'</div></div>';
     }).join('');
-    if(list.length>SHOW){more.hidden=false;more.onclick=function(){var open=more.textContent=='Vis f\u00e6rre';
-      box.querySelectorAll('.gig').forEach(function(el,i){if(i>=SHOW)el.hidden=open;});more.textContent=open?'Vis flere':'Vis f\u00e6rre';};}
+    if(list.length>SHOW){more.hidden=false;more.onclick=function(){var open=more.textContent=='Vis mindre';
+      box.querySelectorAll('.gig').forEach(function(el,i){if(i>=SHOW)el.hidden=open;});more.textContent=open?'Vis mer':'Vis mindre';};}
   }
   if(!SHEET_CSV_URL){render([]);return;}
   fetch(SHEET_CSV_URL,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){render(parseCSV(t));}).catch(function(){render([]);});
