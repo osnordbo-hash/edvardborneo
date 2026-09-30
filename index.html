@@ -10,7 +10,7 @@
 <style>
 :root{--bg:#fff;--ink:#111;--mut:#777;--line:#e8e8e8}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scroll-padding-top:60px}
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',Helvetica,Arial,sans-serif;font-stretch:108%;font-weight:400;font-size:16px;line-height:1.6;letter-spacing:.03em;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px)}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
@@ -18,14 +18,16 @@ img{display:block;max-width:100%}
 .up{text-transform:uppercase;letter-spacing:.12em}
 
 /* TOPP */
-header{text-align:center;padding:34px 0 10px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:#fff;text-align:center;padding:16px 0 8px}
+.bar.scrolled{box-shadow:0 1px 0 var(--line)}
+.socrow{padding:6px 0 0}
 .nav{display:none}
 .nav a{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;padding-bottom:6px;border-bottom:2px solid transparent;transition:border-color .2s}
 .nav a:hover{border-color:var(--ink)}
 .burger{display:block;margin:0 auto;width:48px;height:40px;background:none;border:none;cursor:pointer;position:relative}
 .burger span{position:absolute;left:4px;right:4px;height:2px;background:var(--ink)}
 .burger span:nth-child(1){top:11px}.burger span:nth-child(2){top:19px}.burger span:nth-child(3){top:27px}
-.soc{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:18px}
+.soc{display:flex;justify-content:center;gap:22px;flex-wrap:wrap}
 .soc a{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;color:var(--mut);transition:color .2s}
 .soc a:hover{color:var(--ink)}
 .drawer{position:fixed;inset:0;z-index:60;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px}
@@ -42,8 +44,8 @@ header{text-align:center;padding:34px 0 10px}
 .hero-copy h1{font-size:clamp(40px,5vw,76px);font-weight:500;font-stretch:115%;line-height:1.02;text-transform:uppercase;letter-spacing:.04em}
 
 /* SEKSJONER */
-section{padding:120px 0}
-.title{text-align:center;font-size:clamp(38px,5vw,64px);font-weight:500;font-stretch:115%;text-transform:uppercase;letter-spacing:.04em;line-height:1;margin-bottom:64px}
+section{padding:90px 0}
+.title{text-align:center;font-size:clamp(38px,5vw,64px);font-weight:500;font-stretch:115%;text-transform:uppercase;letter-spacing:.04em;line-height:1;margin-bottom:52px}
 .cap{margin-top:24px;font-size:clamp(16px,1.6vw,20px);letter-spacing:.06em}
 .cap small{display:block;color:var(--mut);font-size:13px;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
 .center{text-align:center}
@@ -134,20 +136,20 @@ body.shop #main{display:none}
 .thanks{display:none;font-size:20px}
 
 @media (max-width:860px){
-  header{padding:22px 0 6px}
+  .bar{padding:12px 0 6px}
   .nav{display:none}
   .burger{display:block}
-  .soc{gap:11px;margin-top:10px;flex-wrap:nowrap}
+  .soc{gap:11px;flex-wrap:nowrap}
   .soc a{font-size:9.5px;letter-spacing:.08em;white-space:nowrap}
   .gigtile{aspect-ratio:4/3}
-  .hero{grid-template-columns:1fr;height:auto;min-height:0;margin-top:22px}
-  .hero-photo{height:auto;min-height:0}
-  .hero-photo img{position:static;height:auto;object-fit:initial}
+  .hero{grid-template-columns:1fr;height:auto;min-height:0;margin-top:14px}
+  .hero-photo{height:auto;min-height:0;aspect-ratio:390/495}
+  .hero-photo img{object-position:50% 88%}
   .hero-img-desktop{display:none}.hero-img-mobile{display:block}
-  .hero-copy{padding:44px 24px 0}
+  .hero-copy{padding:28px 24px 0}
   .wrap{padding:0 20px}
-  section{padding:88px 0}
-  .title{margin-bottom:44px}
+  section{padding:60px 0}
+  .title{margin-bottom:34px}
   .bio{grid-template-columns:1fr;gap:36px}
   .products{grid-template-columns:1fr 1fr;gap:20px;margin-bottom:64px}
   .fgrid{grid-template-columns:1fr}
@@ -161,13 +163,13 @@ body.shop #main{display:none}
 </head>
 <body>
 
-<header>
+<div class="bar" id="bar">
   <div class="wrap">
     <nav class="nav" id="nav"><a href="#tour">Konserter</a><a href="#music">Musikk</a><a href="#bio">Bio</a><a href="#band">Band</a><a href="#butikk">Butikk</a><a href="#booking">Booking</a></nav>
     <button class="burger" id="burger" aria-label="Meny" aria-expanded="false"><span></span><span></span><span></span></button>
-    <div class="soc"><a href="https://open.spotify.com/artist/5pPdSRs7ZFOanxQuGkdom6" target="_blank" rel="noopener">Spotify</a><a href="https://www.instagram.com/edvardborneo/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@EdvardBorneo" target="_blank" rel="noopener">YouTube</a><a href="https://www.facebook.com/EdvardBorneoen" target="_blank" rel="noopener">Facebook</a><a href="https://soundcloud.com/edvard-borneo" target="_blank" rel="noopener">SoundCloud</a></div>
   </div>
-</header>
+</div>
+<div class="socrow"><div class="wrap"><div class="soc"><a href="https://open.spotify.com/artist/5pPdSRs7ZFOanxQuGkdom6" target="_blank" rel="noopener">Spotify</a><a href="https://www.instagram.com/edvardborneo/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@EdvardBorneo" target="_blank" rel="noopener">YouTube</a><a href="https://www.facebook.com/EdvardBorneoen" target="_blank" rel="noopener">Facebook</a><a href="https://soundcloud.com/edvard-borneo" target="_blank" rel="noopener">SoundCloud</a></div></div></div>
 <div class="drawer" id="drawer"><button class="close" id="close" aria-label="Lukk">&times;</button><div id="drawerLinks" style="display:contents"></div></div>
 
 <div id="main">
@@ -275,6 +277,9 @@ body.shop #main{display:none}
 </footer>
 
 <script>
+/* Sticky meny: tynn strek når siden er scrollet */
+(function(){var b=document.getElementById('bar');function f(){b.classList.toggle('scrolled',window.scrollY>4);}window.addEventListener('scroll',f,{passive:true});f();})();
+
 /* Meny: mobilmenyen bygges fra toppmenyen, s&aring; rekkef&oslash;lgen alltid er lik */
 (function(){
   var nav=document.getElementById('nav'),dl=document.getElementById('drawerLinks'),dr=document.getElementById('drawer'),
