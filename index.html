@@ -379,7 +379,7 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
       var d=pad(g._d.getDate())+'.'+pad(g._d.getMonth()+1)+(g._e?' &ndash; '+pad(g._e.getDate())+'.'+pad(g._e.getMonth()+1):'');
       var bill=g.billett?(/^https?:/.test(g.billett)?g.billett:null):'#booking';
       var acts=(bill?'<a href="'+esc(bill)+'"'+(bill[0]=='#'?'':' target="_blank" rel="noopener"')+'>Billetter</a>':'')+
-        '<span class="calwrap"><button type="button" class="calbtn" aria-expanded="false">Legg til i kalender</button><span class="calmenu" hidden><a href="'+cal(g)+'" target="_blank" rel="noopener">Google Kalender</a><a href="'+ics(g)+'" download="edvard-borneo.ics">Apple Kalender (iPhone/Mac)</a><a href="'+outl(g)+'" target="_blank" rel="noopener">Outlook</a></span></span>'+
+        '<span class="calwrap"><button type="button" class="calbtn" aria-expanded="false">Legg til i kalender</button><span class="calmenu" hidden><a href="'+cal(g)+'" target="_blank" rel="noopener">Google Kalender</a><a class="icsl" href="'+ics(g)+'" download="edvard-borneo.ics">Apple Kalender (iPhone/Mac)</a><a href="'+outl(g)+'" target="_blank" rel="noopener">Outlook</a></span></span>'+
         '<a href="'+map(g)+'" target="_blank" rel="noopener">Kart</a>'+
         (g.facebook?'<a href="'+esc(g.facebook)+'" target="_blank" rel="noopener">Event</a>':'');
       var nb=g.merknad||((g.billett&&!bill)?g.billett:'');
@@ -389,6 +389,11 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
     if(list.length>SHOW){more.hidden=false;more.onclick=function(){var open=more.textContent=='Vis mindre';
       box.querySelectorAll('.gig').forEach(function(el,i){if(i>=SHOW)el.hidden=open;});more.textContent=open?'Vis mer':'Vis mindre';};}
   }
+  document.addEventListener('click',function(ev){var a=ev.target.closest&&ev.target.closest('.icsl');
+    if(a){ev.preventDefault();try{var txt=decodeURIComponent(a.getAttribute('href').split(',')[1]);
+      var blob=new Blob([txt],{type:'text/calendar;charset=utf-8'}),url=URL.createObjectURL(blob);
+      var dl=document.createElement('a');dl.href=url;dl.download='edvard-borneo.ics';document.body.appendChild(dl);dl.click();
+      setTimeout(function(){document.body.removeChild(dl);URL.revokeObjectURL(url);},4000);}catch(e){window.location.href=a.getAttribute('href');}}});
   document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('.calbtn');
     document.querySelectorAll('.calmenu').forEach(function(m){if(!b||m!==b.nextElementSibling){m.hidden=true;if(m.previousElementSibling)m.previousElementSibling.setAttribute('aria-expanded','false');}});
     if(b){var m=b.nextElementSibling;m.hidden=!m.hidden;b.setAttribute('aria-expanded',m.hidden?'false':'true');}});
