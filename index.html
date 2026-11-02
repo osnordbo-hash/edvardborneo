@@ -84,6 +84,12 @@ section{padding:64px 0}
 .gig .acts{display:flex;flex-wrap:wrap;gap:12px 26px;margin-top:20px}
 .gig .acts a{font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;border-bottom:1px solid var(--ink);padding-bottom:3px}
 .gig .acts a:hover{color:var(--mut);border-color:var(--mut)}
+.gig .calwrap{position:relative;display:inline-block}
+.gig .calbtn{font:inherit;font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;border:0;border-bottom:1px solid var(--ink);padding:0 0 3px;background:none;color:inherit;cursor:pointer}
+.gig .calbtn:hover{color:var(--mut);border-color:var(--mut)}
+.gig .calmenu{position:absolute;top:100%;left:0;z-index:5;display:flex;flex-direction:column;gap:14px;margin-top:10px;padding:16px 18px;border:1px solid var(--line);background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.08);white-space:nowrap}
+.gig .calmenu[hidden]{display:none}
+.gig .calmenu a{border-bottom:0;padding-bottom:0;letter-spacing:.1em}
 .gig-empty{padding:30px 0;text-align:center;color:var(--mut)}
 .gig-empty a{color:var(--ink);border-bottom:1px solid var(--ink)}
 .more{margin-top:40px;background:#fff;border:1px solid var(--ink);padding:14px 30px;font:inherit;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;cursor:pointer}
@@ -353,6 +359,15 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
     if(t&&!g._e){var st=ymd(s)+'T'+pad(+t[1])+t[2]+'00',en=ymd(s)+'T'+pad(Math.min(+t[1]+2,23))+t[2]+'00';dates=st+'/'+en;}
     else{var n=new Date(e);n.setDate(n.getDate()+1);dates=ymd(s)+'/'+ymd(n);}
     return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Edvard Borneo – '+(g.sted||''))+'&dates='+dates+'&location='+encodeURIComponent([g.sted,g.by].filter(Boolean).join(', '))+'&ctz=Europe/Oslo';}
+  function cparts(g){var s=g._d,e=g._e||g._d,t=(g.tid||'').match(/^(\d{1,2}):(\d{2})/);
+    if(t&&!g._e){return{timed:true,s:ymd(s)+'T'+pad(+t[1])+t[2]+'00',e:ymd(s)+'T'+pad(Math.min(+t[1]+2,23))+t[2]+'00',si:s.getFullYear()+'-'+pad(s.getMonth()+1)+'-'+pad(s.getDate())+'T'+pad(+t[1])+':'+t[2]+':00',ei:s.getFullYear()+'-'+pad(s.getMonth()+1)+'-'+pad(s.getDate())+'T'+pad(Math.min(+t[1]+2,23))+':'+t[2]+':00'};}
+    var n=new Date(e);n.setDate(n.getDate()+1);return{timed:false,s:ymd(s),e:ymd(n),si:s.getFullYear()+'-'+pad(s.getMonth()+1)+'-'+pad(s.getDate()),ei:n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())};}
+  function ics(g){var c=cparts(g),loc=[g.sted,g.by].filter(Boolean).join(', ').replace(/([,;])/g,'\\$1');
+    var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Edvard Borneo//NO','BEGIN:VEVENT','UID:'+c.s+'-'+encodeURIComponent(g.sted||'')+'@edvardborneo.no','DTSTAMP:'+ymd(new Date())+'T000000Z',
+      c.timed?'DTSTART;TZID=Europe/Oslo:'+c.s:'DTSTART;VALUE=DATE:'+c.s,c.timed?'DTEND;TZID=Europe/Oslo:'+c.e:'DTEND;VALUE=DATE:'+c.e,
+      'SUMMARY:'+('Edvard Borneo \u2013 '+(g.sted||'')).replace(/([,;])/g,'\\$1'),'LOCATION:'+loc,'END:VEVENT','END:VCALENDAR'];
+    return 'data:text/calendar;charset=utf-8,'+encodeURIComponent(L.join('\r\n'));}
+  function outl(g){var c=cparts(g);return 'https://outlook.live.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent&subject='+encodeURIComponent('Edvard Borneo \u2013 '+(g.sted||''))+'&startdt='+encodeURIComponent(c.si)+'&enddt='+encodeURIComponent(c.ei)+(c.timed?'':'&allday=true')+'&location='+encodeURIComponent([g.sted,g.by].filter(Boolean).join(', '));}
   function map(g){var q=(g.lat&&g.lng)?g.lat+','+g.lng:[g.sted,g.by].filter(Boolean).join(', ');return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);}
   function render(list){
     var today=new Date();today.setHours(0,0,0,0);
@@ -364,7 +379,7 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
       var d=pad(g._d.getDate())+'.'+pad(g._d.getMonth()+1)+(g._e?' &ndash; '+pad(g._e.getDate())+'.'+pad(g._e.getMonth()+1):'');
       var bill=g.billett?(/^https?:/.test(g.billett)?g.billett:null):'#booking';
       var acts=(bill?'<a href="'+esc(bill)+'"'+(bill[0]=='#'?'':' target="_blank" rel="noopener"')+'>Billetter</a>':'')+
-        '<a href="'+cal(g)+'" target="_blank" rel="noopener">Legg til i kalender</a>'+
+        '<span class="calwrap"><button type="button" class="calbtn" aria-expanded="false">Legg til i kalender</button><span class="calmenu" hidden><a href="'+cal(g)+'" target="_blank" rel="noopener">Google Kalender</a><a href="'+ics(g)+'" download="edvard-borneo.ics">Apple Kalender (iPhone/Mac)</a><a href="'+outl(g)+'" target="_blank" rel="noopener">Outlook</a></span></span>'+
         '<a href="'+map(g)+'" target="_blank" rel="noopener">Kart</a>'+
         (g.facebook?'<a href="'+esc(g.facebook)+'" target="_blank" rel="noopener">Event</a>':'');
       var nb=g.merknad||((g.billett&&!bill)?g.billett:'');
@@ -374,6 +389,9 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
     if(list.length>SHOW){more.hidden=false;more.onclick=function(){var open=more.textContent=='Vis mindre';
       box.querySelectorAll('.gig').forEach(function(el,i){if(i>=SHOW)el.hidden=open;});more.textContent=open?'Vis mer':'Vis mindre';};}
   }
+  document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('.calbtn');
+    document.querySelectorAll('.calmenu').forEach(function(m){if(!b||m!==b.nextElementSibling){m.hidden=true;if(m.previousElementSibling)m.previousElementSibling.setAttribute('aria-expanded','false');}});
+    if(b){var m=b.nextElementSibling;m.hidden=!m.hidden;b.setAttribute('aria-expanded',m.hidden?'false':'true');}});
   if(!SHEET_CSV_URL){render([]);return;}
   fetch(SHEET_CSV_URL,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){render(parseCSV(t));}).catch(function(){render([]);});
 })();
