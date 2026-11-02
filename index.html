@@ -179,6 +179,14 @@ body.shop #main{display:none}
 #tour{margin-top:48px;padding-top:56px;position:relative}
 #tour::before{content:"";position:absolute;top:0;left:50%;width:64px;height:2px;background:#111;transform:translateX(-50%)}
 @media(max-width:760px){#tour{margin-top:36px;padding-top:44px}}
+/* Mobil: første skjerm (meny, sosiale lenker, bilde og navn) fyller akkurat skjermen uansett telefonstørrelse */
+@media(max-width:860px){
+  .hero{min-height:0}
+  .hero-photo{aspect-ratio:auto;min-height:260px;height:calc(100vh - var(--hdr,140px) - var(--nm,110px) + 10px);height:calc(100svh - var(--hdr,140px) - var(--nm,110px) + 10px)}
+  .hero-photo img{object-position:50% 80%}
+  .hero-copy{padding-bottom:0}
+  #tour{margin-top:48px}
+}
 </style>
 </head>
 <body>
