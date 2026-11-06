@@ -390,7 +390,7 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
       box.querySelectorAll('.gig').forEach(function(el,i){if(i>=SHOW)el.hidden=open;});more.textContent=open?'Vis mer':'Vis mindre';};}
   }
   document.addEventListener('click',function(ev){var a=ev.target.closest&&ev.target.closest('.icsl');
-    if(a){ev.preventDefault();if(((/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1))&&!/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent))){window.location.href=a.getAttribute('href');return;}try{var txt=decodeURIComponent(a.getAttribute('href').split(',')[1]);
+    if(a){ev.preventDefault();try{var txt=decodeURIComponent(a.getAttribute('href').split(',')[1]);
       var blob=new Blob([txt],{type:'text/calendar;charset=utf-8'}),url=URL.createObjectURL(blob);
       var dl=document.createElement('a');dl.href=url;dl.download='edvard-borneo.ics';document.body.appendChild(dl);dl.click();
       setTimeout(function(){document.body.removeChild(dl);URL.revokeObjectURL(url);},4000);}catch(e){window.location.href=a.getAttribute('href');}}});
