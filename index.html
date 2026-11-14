@@ -397,8 +397,11 @@ var BANDSINTOWN='https://artists.bandsintown.com/artists/15517593/events/upcomin
   document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('.calbtn');
     document.querySelectorAll('.calmenu').forEach(function(m){if(!b||m!==b.nextElementSibling){m.hidden=true;if(m.previousElementSibling)m.previousElementSibling.setAttribute('aria-expanded','false');}});
     if(b){var m=b.nextElementSibling;m.hidden=!m.hidden;b.setAttribute('aria-expanded',m.hidden?'false':'true');}});
-  if(!SHEET_CSV_URL){render([]);return;}
-  fetch(SHEET_CSV_URL,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){render(parseCSV(t));}).catch(function(){render([]);});
+  // Konserter kommer fra Google-arket og fra konserter.csv i repoet (slås sammen, duplikater fjernes)
+  function getCSV(u){if(!u)return Promise.resolve([]);
+    return fetch(u,{cache:'no-store'}).then(function(r){return r.ok?r.text():'';}).then(function(t){return t?parseCSV(t):[];}).catch(function(){return [];});}
+  Promise.all([getCSV(SHEET_CSV_URL),getCSV('/konserter.csv')]).then(function(res){var seen={};
+    render(res[0].concat(res[1]).filter(function(g){var k=(g.dato||'')+'|'+(g.sted||'').toLowerCase();if(seen[k])return false;seen[k]=1;return true;}));});
 })();
 
 /* Kart + nærmeste konsert (som på oskarnordbo.no) */
